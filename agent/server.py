@@ -1,8 +1,7 @@
 import socket
 import json
 
-from agent.model import ChatGPTAPI
-from agent.rag import retrieve_related_chunks
+from agent.process import process_map
 
 
 def start_server():
@@ -17,8 +16,6 @@ def start_server():
     conn, address = server_socket.accept()
     print(f"Клиент подключился с адреса: {address}")
 
-    model = ChatGPTAPI()
-
     while True:
         data = ""
         while True:
@@ -31,29 +28,12 @@ def start_server():
 
         print(f"Получен JSON от клиента: {map_info}")
 
-        map_desc_help = retrieve_related_chunks(map_info['map']['description'])
-        char_desc_help = []
-        for character in map_info['characters']:
-            char_desc_help.append(retrieve_related_chunks(character['description']))
-        print(map_desc_help)
-
-        help = ''
-        for res in map_desc_help['chunks']:
-            help += res['description']
-        for char in char_desc_help:
-            for res in char['chunks']:
-                help += res['description']
-
-        print('Дополнительная информация:\n', help)
-
-        query = str(map_info) + "\n\n" + "Дополнительная информация:" + help
-        res = model.call_api(query)
+        res = process_map(map_info)
 
         print('Ответ модели:\n', res)
 
         # Ответ клиенту
-        response = {"message": str(res), "status": 200}
-        conn.send(json.dumps(response).encode('utf-8'))
+        conn.send(json.dumps(res).encode('utf-8'))
         break
 
     conn.close()
