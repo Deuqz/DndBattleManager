@@ -8,7 +8,6 @@ def process_map(map_info):
     char_desc_help = []
     for character in map_info['characters']:
         char_desc_help.append(retrieve_related_chunks(character['description']))
-    print(map_desc_help)
 
     help = ''
     for res in map_desc_help['chunks']:
@@ -20,6 +19,7 @@ def process_map(map_info):
     print('Дополнительная информация:\n', help)
 
     query = str(map_info) + "\n\n" + "Дополнительная информация:" + help
-    res = model.call_api(query)
+    action = model.generate_action(query)
+    new_map_info = model.update_map(map_info, action)
 
-    return {"message": res, "status": 200}
+    return {"message": action, "data": new_map_info}

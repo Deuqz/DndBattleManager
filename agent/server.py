@@ -16,27 +16,25 @@ def start_server():
     conn, address = server_socket.accept()
     print(f"Клиент подключился с адреса: {address}")
 
-    while True:
-        data = ""
+    with server_socket.accept() as conn, address:
         while True:
-            data += conn.recv(1024).decode('utf-8')
-            try:
-                map_info = json.loads(data)
-                break
-            except json.JSONDecodeError:
-                pass
+            data = ""
+            while True:
+                data += conn.recv(1024).decode('utf-8')
+                try:
+                    map_info = json.loads(data)
+                    break
+                except json.JSONDecodeError:
+                    pass
 
-        print(f"Получен JSON от клиента: {map_info}")
+            print(f"Получен JSON от клиента: {map_info}")
 
-        res = process_map(map_info)
+            res = process_map(map_info)
 
-        print('Ответ модели:\n', res)
+            print('Ответ модели:\n', res)
 
-        # Ответ клиенту
-        conn.send(json.dumps(res).encode('utf-8'))
-        break
-
-    conn.close()
+            # Ответ клиенту
+            conn.send(json.dumps(res).encode('utf-8'))
 
 if __name__ == "__main__":
     start_server()
