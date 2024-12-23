@@ -1,4 +1,3 @@
-import json
 import requests
 
 rag_url = "http://213.139.208.158:8000/search"

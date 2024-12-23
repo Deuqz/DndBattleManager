@@ -29,6 +29,8 @@ def start_client():
     message = json.loads(data)['message']
     print(message)
 
+    print(json.loads(data)['data'])
+
     client_socket.close()
 
 if __name__ == "__main__":
