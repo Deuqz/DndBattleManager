@@ -42,12 +42,12 @@ class ChatGPTAPI:
     def update_map(self, map_info: dict, action: str):
         query = str(map_info) + "\n\n" + action
         response = self.client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": update_prompt},
                 {"role": "user", "content": query}
             ],
-            temperature=0.3,
+            temperature=0.05,
             response_format={"type": "json_object"}
         )
         return json.loads(response.choices[0].message.content)
