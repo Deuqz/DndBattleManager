@@ -42,7 +42,7 @@ class ChatGPTAPI:
     def update_map(self, map_info: dict, action: str):
         query = str(map_info) + "\n\n" + action
         response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": update_prompt},
                 {"role": "user", "content": query}
