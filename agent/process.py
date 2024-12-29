@@ -1,13 +1,13 @@
-from agent.model import ChatGPTAPI
-from agent.rag import retrieve_related_chunks
+from model import ChatGPTAPI
+from rag import retrieve_related_chunks
 
 
 def process_map(map_info):
     model = ChatGPTAPI()
-    map_desc_help = retrieve_related_chunks(map_info['map']['description'])
+    map_desc_help = retrieve_related_chunks(map_info['map']['desc']['desc'])
     char_desc_help = []
-    for character in map_info['characters']:
-        char_desc_help.append(retrieve_related_chunks(character['description']))
+    for character in map_info['chars']:
+        char_desc_help.append(retrieve_related_chunks(character['desc']))
 
     help = ''
     for res in map_desc_help['chunks']:

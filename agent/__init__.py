@@ -1,0 +1,3 @@
+"""D&D Game Master API package."""
+
+__version__ = "0.1.0"
