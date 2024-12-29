@@ -97,6 +97,7 @@ export default function HomePage() {
       chars: characters.map(char => ({
         id: char.id,
         name: char.name,
+        desc: char.description,
         pos: [char.position.x, char.position.y],
         icon: char.icon,
         stats: {
@@ -210,7 +211,7 @@ export default function HomePage() {
     try {
       const currentState = getCurrentGameState();
       
-      const response = await fetch('/api/game/turn', {
+      const response = await fetch('https://amiapi.faneagain.ru/process-map', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,20 +219,34 @@ export default function HomePage() {
         body: JSON.stringify(currentState),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       
       // Update map state with new data
-      setMap(data.mapData);
-      setCharacters(data.entities);
+      if (data.mapData) {
+        setMap(data.mapData);
+      }
+      if (data.entities) {
+        setCharacters(data.entities);
+      }
       
       // Find the index of the next character in the turn order
-      const nextCharacterIndex = turnOrder.findIndex(char => char.name === data.currentTurn);
-      setCurrentTurn(nextCharacterIndex !== -1 ? nextCharacterIndex : 0);
+      if (data.currentTurn) {
+        const nextCharacterIndex = turnOrder.findIndex(char => char.name === data.currentTurn);
+        setCurrentTurn(nextCharacterIndex !== -1 ? nextCharacterIndex : 0);
+      }
       
-      // Add new action to battle log
-      setBattleLog(prev => [...prev, data.actionText]);
+      // Add new action to battle log if provided
+      if (data.actionText) {
+        setBattleLog(prev => [...prev, data.actionText]);
+      }
+
     } catch (error) {
       console.error('Error processing turn:', error);
+      setBattleLog(prev => [...prev, `Error: Failed to process turn - ${error.message}`]);
     }
   };
 
