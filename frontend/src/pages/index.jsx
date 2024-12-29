@@ -223,25 +223,38 @@ export default function HomePage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const { message, data } = await response.json();
       
-      // Update map state with new data
-      if (data.mapData) {
-        setMap(data.mapData);
+      // Update characters with new data
+      if (data.chars) {
+        const updatedCharacters = data.chars.map(char => ({
+          ...char,
+          position: { x: char.pos[0], y: char.pos[1] }, // Convert position array to object
+          stats: {
+            ...char.stats,
+            maxHp: char.stats.max, // Map max to maxHp
+          }
+        }));
+        setCharacters(updatedCharacters);
       }
-      if (data.entities) {
-        setCharacters(data.entities);
+
+      // Update turn order
+      if (data.turn) {
+        const newTurnOrder = characters.filter(char => 
+          data.turn.order.includes(char.name)
+        );
+        setTurnOrder(newTurnOrder);
+
+        // Find and set current turn index
+        const currentCharacterIndex = newTurnOrder.findIndex(
+          char => char.name === data.turn.current
+        );
+        setCurrentTurn(currentCharacterIndex !== -1 ? currentCharacterIndex : 0);
       }
-      
-      // Find the index of the next character in the turn order
-      if (data.currentTurn) {
-        const nextCharacterIndex = turnOrder.findIndex(char => char.name === data.currentTurn);
-        setCurrentTurn(nextCharacterIndex !== -1 ? nextCharacterIndex : 0);
-      }
-      
-      // Add new action to battle log if provided
-      if (data.actionText) {
-        setBattleLog(prev => [...prev, data.actionText]);
+
+      // Add the narrative message to battle log
+      if (message) {
+        setBattleLog(prev => [...prev, message]);
       }
 
     } catch (error) {
@@ -395,7 +408,7 @@ export default function HomePage() {
             onClick={() => setShowCharacterCreation(true)}
             className="fixed left-4 top-32 w-64 px-4 py-3 bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bg-hover)] transition-colors shadow-lg"
           >
-            ��� Добавить Персонажа
+            Добавить Персонажа
           </button>
 
           <div className="relative w-[800px] h-[800px] rounded-lg bg-[var(--color-map-bg)] overflow-hidden shadow-2xl border-8 border-[var(--color-wall-border)]">

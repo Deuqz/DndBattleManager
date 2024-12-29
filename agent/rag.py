@@ -12,8 +12,12 @@ def retrieve_related_chunks(query: str) -> dict:
     response = requests.get(url, params=params)
     if response.status_code == 200:
         chunks = response.json()[:3]
+        for i in range(len(chunks)):
+            chunks[i]['description'] = chunks[i]['description'][:300]
         print(len(chunks))
+        print(len(str(chunks)))
         print(chunks)
+
         return {"chunks": chunks}
     else:
         return {"error": f"API request failed with status code {response.status_code}"}

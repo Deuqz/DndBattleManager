@@ -24,8 +24,13 @@ class ChatGPTAPI:
         raise Exception("Don't call refresh_token() for ChatGPT")
 
     def generate_action(self, query: str) -> str:
+
+        print([
+        {"role": "system", "content": action_prompt},
+        {"role": "user", "content": query}
+        ])
         response = self.client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": action_prompt},
                 {"role": "user", "content": query}
@@ -37,7 +42,7 @@ class ChatGPTAPI:
     def update_map(self, map_info: dict, action: str):
         query = str(map_info) + "\n\n" + action
         response = self.client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": update_prompt},
                 {"role": "user", "content": query}

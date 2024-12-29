@@ -16,10 +16,14 @@ def process_map(map_info):
         for res in char['chunks']:
             help += res['description']
 
-    print('Дополнительная информация:\n', help)
+    # map_info['map'].pop('tiles')
+    # print('Дополнительная информация:\n', help)
 
-    query = str(map_info) + "\n\n" + "Дополнительная информация:" + help
+    query = str(map_info).replace('\n', '') + "\n\n" + "Дополнительная информация:" + help
+
+    print(query)
     action = model.generate_action(query)
+    print(action)
     new_map_info = model.update_map(map_info, action)
-
+    print(new_map_info)
     return {"message": action, "data": new_map_info}
